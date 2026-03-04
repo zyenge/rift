@@ -12,11 +12,6 @@ android/
 prisma/migrations/
 coverage/
 
-# Media files (too large for git)
-*.mp4
-*.mov
-*.gif
-video-assets/
 
 # Cache / tooling
 .clang-cache/
