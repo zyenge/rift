@@ -718,8 +718,8 @@
       }
 
       .panel-cta .panel-inner {
-        grid-template-columns: 1fr auto;
-        gap: 6rem;
+        grid-template-columns: 1fr 1fr;
+        gap: 4rem;
         align-items: center;
       }
 
@@ -749,29 +749,18 @@
         text-transform: uppercase;
       }
 
-      /* Two overlapping phones */
+      /* Two side-by-side phones */
       .phones-showcase {
-        position: relative;
-        width: 360px;
-        height: calc(var(--phone-h) + 60px);
+        display: flex;
+        gap: 2rem;
+        align-items: flex-end;
         flex-shrink: 0;
       }
 
-      .phone-back {
-        position: absolute;
-        left: 0;
-        top: 30px;
-        opacity: 0.72;
-        transform: rotate(-5deg) scale(0.93);
-        z-index: 1;
-      }
-
-      .phone-front {
-        position: absolute;
-        right: 0;
-        top: 0;
-        z-index: 2;
-        transform: rotate(3deg);
+      .phone-back, .phone-front {
+        position: static;
+        opacity: 1;
+        transform: none;
       }
 
       .phone-screenshot {
@@ -1048,7 +1037,7 @@
               <span class="brand-name">Rift</span>
             </div>
 
-            <h2>The app is real.<br><span class="highlight">Launching soon.</span></h2>
+            <h2><span class="highlight">Launching soon.</span></h2>
             <p>
               Request live visuals from people nearby. Fulfill on the spot.
               No algorithm. No feed. Just presence, on demand.
