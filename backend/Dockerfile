@@ -20,9 +20,11 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install --omit=dev --legacy-peer-deps
 
-COPY prisma ./prisma
-RUN ./node_modules/.bin/prisma generate
+# Copy Prisma CLI (devDep) and generated client from builder
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
 
+COPY prisma ./prisma
 COPY --from=builder /app/dist ./dist
 
 EXPOSE 3000
