@@ -23,6 +23,7 @@ RUN npm install --omit=dev --legacy-peer-deps
 # Copy Prisma CLI (devDep) and generated client from builder
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
+COPY --from=builder /app/node_modules/.bin/prisma ./node_modules/.bin/prisma
 
 COPY prisma ./prisma
 COPY --from=builder /app/dist ./dist
