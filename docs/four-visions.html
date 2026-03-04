@@ -49,17 +49,14 @@
       main {
         height: 100vh;
         overflow-y: scroll;
-        scroll-snap-type: y mandatory;
         scrollbar-width: none;
+        scroll-behavior: smooth;
       }
       main::-webkit-scrollbar { display: none; }
 
       /* ── Panel base ──────────────────────────────────────────────────── */
       .panel {
-        height: 100vh;
         min-height: 100vh;
-        scroll-snap-align: start;
-        scroll-snap-stop: always;
         position: relative;
         display: flex;
         align-items: center;
@@ -326,7 +323,7 @@
         grid-template-columns: 1fr 1fr;
         gap: 0;
         align-items: stretch;
-        height: 100vh;
+        min-height: 100vh;
         padding: 0;
       }
 
@@ -625,13 +622,15 @@
 
         main { height: 100dvh; }
 
-        .panel { height: 100dvh; }
+        .panel { min-height: 100dvh; height: auto; }
+
+        .panel-intro { height: 100dvh; }
 
         .panel-inner {
           grid-template-columns: 1fr !important;
-          gap: 2rem !important;
+          gap: 0 !important;
           padding: 2rem 0;
-          align-content: center;
+          align-content: start;
         }
 
         .phone-wrap {
@@ -651,24 +650,25 @@
         .panel-v3 .panel-inner {
           grid-template-columns: 1fr !important;
           height: auto !important;
+          min-height: auto !important;
         }
 
         .video-wrap {
-          order: -1;
+          order: 1;
           width: 100%;
-          min-height: 50vw;
-          height: 50vw;
+          min-height: 60vw;
+          height: 60vw;
         }
 
         .video-clean {
-          min-height: 50vw;
-          height: 50vw;
+          min-height: 60vw;
+          height: 60vw;
         }
 
         .panel-v1 .panel-text,
         .panel-v2 .panel-text,
         .panel-v3 .panel-text {
-          padding: 1.5rem 1.25rem;
+          padding: 2rem 1.25rem 1.5rem;
         }
 
         h1 { font-size: 2rem; }
@@ -779,8 +779,8 @@
           <div class="video-wrap">
             <video
               class="video-clean"
-              src="./utility_use_case.mp4"
-              loop playsinline preload="metadata"
+              src="./utility_use_case.mp4#t=0.001"
+              loop playsinline preload="auto"
             ></video>
           </div>
           <button class="video-btn" aria-label="Play">
@@ -822,9 +822,9 @@
           <div class="video-wrap">
             <video
               class="video-clean"
-              loop playsinline preload="metadata"
+              loop playsinline preload="auto"
             >
-              <source src="./diaspora_use_case.mp4" type="video/mp4">
+              <source src="./diaspora_use_case.mp4#t=0.001" type="video/mp4">
             </video>
           </div>
           <button class="video-btn" aria-label="Play">
@@ -865,8 +865,8 @@
           <div class="video-wrap">
             <video
               class="video-clean"
-              src="./travel_use_case.mp4"
-              loop playsinline preload="metadata"
+              src="./travel_use_case.mp4#t=0.001"
+              loop playsinline preload="auto"
             ></video>
           </div>
           <button class="video-btn" aria-label="Play">
