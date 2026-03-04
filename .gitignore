@@ -9,7 +9,6 @@ ios/
 android/
 *.log
 .DS_Store
-prisma/migrations/
 coverage/
 
 
