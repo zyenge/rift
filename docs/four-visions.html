@@ -787,6 +787,12 @@
         transform: none;
       }
 
+      /* Hide notch + side button for CTA screenshot phones */
+      .phones-showcase .phone-frame::before,
+      .phones-showcase .phone-frame::after {
+        display: none;
+      }
+
       .phone-screenshot {
         width: 100%;
         height: 100%;
