@@ -5,7 +5,7 @@ COPY package*.json ./
 RUN npm install --legacy-peer-deps
 
 COPY prisma ./prisma
-RUN npx prisma generate
+RUN ./node_modules/.bin/prisma generate
 
 COPY tsconfig.json ./
 COPY src ./src
@@ -21,7 +21,7 @@ COPY package*.json ./
 RUN npm install --omit=dev --legacy-peer-deps
 
 COPY prisma ./prisma
-RUN npx prisma generate
+RUN ./node_modules/.bin/prisma generate
 
 COPY --from=builder /app/dist ./dist
 
