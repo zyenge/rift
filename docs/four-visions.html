@@ -692,6 +692,94 @@
         .panel-v4 .panel-inner {
           grid-template-columns: 1fr !important;
         }
+
+        .panel-cta .panel-inner {
+          grid-template-columns: 1fr !important;
+          text-align: center;
+          align-items: center;
+        }
+
+        .cta-text { align-items: center; }
+
+        .phones-showcase {
+          margin: 0 auto;
+        }
+
+        .coming-soon-badge {
+          margin-left: auto;
+          margin-right: auto;
+        }
+      }
+
+      /* ── Coming Soon panel ───────────────────────────────────────────── */
+      .panel-cta {
+        background: var(--bg-primary);
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .panel-cta .panel-inner {
+        grid-template-columns: 1fr auto;
+        gap: 6rem;
+        align-items: center;
+      }
+
+      .cta-text {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .cta-text h2 { margin-bottom: 1rem; }
+
+      .cta-text p { margin-bottom: 0; }
+
+      .coming-soon-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.6rem;
+        margin-top: 2rem;
+        padding: 0.5rem 1.2rem;
+        background: var(--brand-dim);
+        border: 1px solid rgba(235, 122, 159, 0.3);
+        border-radius: 999px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: var(--brand);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      /* Two overlapping phones */
+      .phones-showcase {
+        position: relative;
+        width: 360px;
+        height: calc(var(--phone-h) + 60px);
+        flex-shrink: 0;
+      }
+
+      .phone-back {
+        position: absolute;
+        left: 0;
+        top: 30px;
+        opacity: 0.72;
+        transform: rotate(-5deg) scale(0.93);
+        z-index: 1;
+      }
+
+      .phone-front {
+        position: absolute;
+        right: 0;
+        top: 0;
+        z-index: 2;
+        transform: rotate(3deg);
+      }
+
+      .phone-screenshot {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: var(--phone-radius);
+        display: block;
       }
     </style>
   </head>
@@ -704,6 +792,7 @@
       <button class="prog-dot" data-idx="2" aria-label="Vision 2"></button>
       <button class="prog-dot" data-idx="3" aria-label="Vision 3"></button>
       <button class="prog-dot" data-idx="4" aria-label="Vision 4"></button>
+      <button class="prog-dot" data-idx="5" aria-label="Coming Soon"></button>
     </nav>
 
     <main id="scroll-main">
@@ -803,7 +892,7 @@
             </p>
             <div class="example-block">
               <div class="label">User request</div>
-              <p>"As an immigrant, I want to see the town I grew up in today."</p>
+              <p>"As an immigrant, I want to show my daughter the town I grew up in today."</p>
             </div>
           </div>
 
@@ -929,6 +1018,61 @@
               </div>
             </div>
             <div class="phone-glow"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════════ -->
+      <!-- COMING SOON                                                     -->
+      <!-- ══════════════════════════════════════════════════════════════ -->
+      <section class="panel panel-cta" id="panel-5">
+        <div class="grid-lines"></div>
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+
+        <div class="panel-inner">
+          <div class="cta-text">
+            <div class="brand-wordmark" style="justify-content:flex-start; margin-bottom:1.8rem;">
+              <div class="brand-mark">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M7 20 L7 3 L14 3 A 5 5 0 0 1 14 13 L7 13 M12.5 13 L19 20"
+                    stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"
+                    opacity="0.25" transform="translate(-5,0)"/>
+                  <path d="M7 20 L7 3 L14 3 A 5 5 0 0 1 14 13 L7 13 M12.5 13 L19 20"
+                    stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"
+                    opacity="0.55" transform="translate(-2.5,0)"/>
+                  <path d="M7 20 L7 3 L14 3 A 5 5 0 0 1 14 13 L7 13 M12.5 13 L19 20"
+                    stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                </svg>
+              </div>
+              <span class="brand-name">Rift</span>
+            </div>
+
+            <h2>The app is real.<br><span class="highlight">Launching soon.</span></h2>
+            <p>
+              Request live visuals from people nearby. Fulfill on the spot.
+              No algorithm. No feed. Just presence, on demand.
+            </p>
+
+            <div class="coming-soon-badge">
+              <span class="pulse-dot"></span>
+              iOS &amp; Android — Coming Soon
+            </div>
+          </div>
+
+          <!-- Two phone screenshots -->
+          <div class="phones-showcase">
+            <div class="phone-wrap phone-back">
+              <div class="phone-frame">
+                <img src="./request_page.PNG" class="phone-screenshot" alt="My Requests screen">
+              </div>
+            </div>
+            <div class="phone-wrap phone-front">
+              <div class="phone-frame">
+                <img src="./loading_page.PNG" class="phone-screenshot" alt="Map screen">
+              </div>
+              <div class="phone-glow"></div>
+            </div>
           </div>
         </div>
       </section>
