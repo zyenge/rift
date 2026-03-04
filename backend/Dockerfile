@@ -2,7 +2,7 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm ci
+RUN npm install --legacy-peer-deps
 
 COPY prisma ./prisma
 RUN npx prisma generate
@@ -18,7 +18,7 @@ RUN apk add --no-cache openssl
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm ci --omit=dev
+RUN npm install --omit=dev --legacy-peer-deps
 
 COPY prisma ./prisma
 RUN npx prisma generate
