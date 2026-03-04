@@ -1,0 +1,12 @@
+ # 1. Start DB + Redis
+  docker-compose up -d
+
+  # 2. Backend
+  cd backend
+  cp .env.example .env   # Set JWT_SECRET
+  npx prisma db push     # Apply schema to DB
+  npm run dev            # http://localhost:3000
+
+  # 3. Mobile (new terminal)
+  cd mobile
+  npx expo start

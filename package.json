@@ -1,0 +1,16 @@
+{
+  "name": "pulse-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "mobile"
+  ],
+  "scripts": {
+    "dev:backend": "npm run dev --workspace=backend",
+    "dev": "npm run dev:backend"
+  },
+  "dependencies": {
+    "expo-video": "^55.0.10"
+  }
+}

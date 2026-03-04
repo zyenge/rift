@@ -1,0 +1,105 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [postgis]
+}
+
+model User {
+  id              String    @id @default(cuid())
+  email           String    @unique
+  username        String    @unique
+  passwordHash    String
+  karmaPoints     Int       @default(0)
+  expoPushToken   String?
+  lastKnownLat    Float?
+  lastKnownLng    Float?
+  lastSeenAt      DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  requests        Request[]       @relation("RequesterRequests")
+  fulfillments    Fulfillment[]   @relation("FulfillerFulfillments")
+  ratingsGiven    Rating[]        @relation("RaterRatings")
+
+  @@map("users")
+}
+
+model Request {
+  id           String        @id @default(cuid())
+  requesterId  String
+  title        String
+  description  String?
+  type         RequestType   @default(INSTANT)
+  status       RequestStatus @default(OPEN)
+  lat          Float
+  lng          Float
+  radiusMeters Int           @default(1000)
+  expiresAt    DateTime
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  requester    User          @relation("RequesterRequests", fields: [requesterId], references: [id])
+  fulfillments Fulfillment[]
+
+  @@map("requests")
+}
+
+model Fulfillment {
+  id           String            @id @default(cuid())
+  requestId    String
+  fulfillerId  String
+  mediaUrl     String
+  mediaType    MediaType
+  status       FulfillmentStatus @default(PENDING)
+  karmaAwarded Int               @default(0)
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+
+  request      Request           @relation(fields: [requestId], references: [id])
+  fulfiller    User              @relation("FulfillerFulfillments", fields: [fulfillerId], references: [id])
+  rating       Rating?
+
+  @@map("fulfillments")
+}
+
+model Rating {
+  id            String      @id @default(cuid())
+  fulfillmentId String      @unique
+  raterId       String
+  score         Int
+  comment       String?
+  createdAt     DateTime    @default(now())
+
+  fulfillment   Fulfillment @relation(fields: [fulfillmentId], references: [id])
+  rater         User        @relation("RaterRatings", fields: [raterId], references: [id])
+
+  @@map("ratings")
+}
+
+enum RequestType {
+  INSTANT
+  GLOBAL
+}
+
+enum RequestStatus {
+  OPEN
+  FULFILLED
+  EXPIRED
+  CANCELLED
+}
+
+enum MediaType {
+  PHOTO
+  VIDEO
+}
+
+enum FulfillmentStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
