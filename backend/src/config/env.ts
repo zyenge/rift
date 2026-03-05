@@ -14,6 +14,11 @@ const envSchema = z.object({
   MAX_FILE_SIZE_MB: z.coerce.number().default(50),
   EXPO_ACCESS_TOKEN: z.string().optional(),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
+  R2_ACCOUNT_ID: z.string(),
+  R2_ACCESS_KEY_ID: z.string(),
+  R2_SECRET_ACCESS_KEY: z.string(),
+  R2_BUCKET_NAME: z.string(),
+  R2_PUBLIC_URL: z.string().url(),
 });
 
 const parsed = envSchema.safeParse(process.env);

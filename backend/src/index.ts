@@ -9,7 +9,6 @@ import authRouter from './routes/auth';
 import usersRouter from './routes/users';
 import requestsRouter from './routes/requests';
 import fulfillmentsRouter from './routes/fulfillments';
-import mediaRouter from './routes/media';
 import { initSocketServer, setIo } from './sockets/fulfillment.socket';
 import { startExpiryJob } from './services/expiry.service';
 
@@ -28,7 +27,6 @@ app.use('/api/v1/requests', requestsRouter);
 // Fulfillment routes — both prefixes for convenience
 app.use('/api/v1/requests', fulfillmentsRouter);
 app.use('/api/v1/fulfillments', fulfillmentsRouter);
-app.use('/api/v1/media', mediaRouter);
 
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
 

@@ -1,9 +1,9 @@
 import { Router, Request, Response } from 'express';
 import { z } from 'zod';
-import path from 'path';
 import { prisma } from '../config/prisma';
 import { requireAuth } from '../middleware/auth';
 import { upload } from '../middleware/upload';
+import { uploadToR2 } from '../services/storage.service';
 import { awardFulfillmentKarma, applyRatingKarma } from '../services/karma.service';
 import { getIo } from '../sockets/fulfillment.socket';
 import { notifyUser } from '../services/notification.service';
@@ -47,7 +47,7 @@ router.post(
     }
 
     const mediaType: MediaType = IMAGE_TYPES.includes(req.file.mimetype) ? 'PHOTO' : 'VIDEO';
-    const mediaUrl = `/api/v1/media/${req.file.filename}`;
+    const mediaUrl = await uploadToR2(req.file.buffer, req.file.originalname, req.file.mimetype);
 
     const fulfillment = await prisma.fulfillment.create({
       data: {
