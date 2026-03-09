@@ -11,6 +11,7 @@ RUN ./node_modules/.bin/prisma generate
 
 COPY tsconfig.json ./
 COPY src ./src
+COPY public ./public
 RUN npm run build
 
 EXPOSE 3000
