@@ -4,6 +4,7 @@ import { prisma } from '../config/prisma';
 import { requireAuth } from '../middleware/auth';
 import { findNearbyActiveUsers, findNearbyRequests } from '../services/geo.service';
 import { notifyNearbyUsers } from '../services/notification.service';
+import { calculateRequestCost, deductCredits, refundCredits } from '../services/credit.service';
 
 const router = Router();
 
@@ -14,6 +15,25 @@ const createRequestSchema = z.object({
   lat: z.number().min(-90).max(90),
   lng: z.number().min(-180).max(180),
   radiusMeters: z.number().min(100).max(50000).optional(),
+});
+
+// GET /requests/cost?lat&lng — preview credit cost before submitting
+router.get('/cost', requireAuth, async (req: Request, res: Response) => {
+  const lat = parseFloat(req.query.lat as string);
+  const lng = parseFloat(req.query.lng as string);
+
+  if (isNaN(lat) || isNaN(lng)) {
+    res.status(400).json({ error: 'lat and lng query params are required' });
+    return;
+  }
+
+  const cost = await calculateRequestCost(lat, lng, req.user!.userId);
+  const user = await prisma.user.findUnique({
+    where: { id: req.user!.userId },
+    select: { credits: true },
+  });
+
+  res.json({ cost, balance: user?.credits ?? 0 });
 });
 
 // POST /requests
@@ -27,11 +47,19 @@ router.post('/', requireAuth, async (req: Request, res: Response) => {
   const { title, description, type, lat, lng, radiusMeters } = parsed.data;
   const requesterId = req.user!.userId;
 
-  // Determine radius and expiry based on type
   const radius = radiusMeters ?? (type === 'INSTANT' ? 1000 : 10000);
   const expiresAt = new Date(
     Date.now() + (type === 'INSTANT' ? 15 * 60 * 1000 : 48 * 60 * 60 * 1000)
   );
+
+  // Calculate cost based on local density, then deduct
+  const creditCost = await calculateRequestCost(lat, lng, requesterId);
+  try {
+    await deductCredits(requesterId, creditCost);
+  } catch {
+    res.status(402).json({ error: 'Insufficient credits' });
+    return;
+  }
 
   const request = await prisma.request.create({
     data: {
@@ -42,10 +70,11 @@ router.post('/', requireAuth, async (req: Request, res: Response) => {
       lat,
       lng,
       radiusMeters: radius,
+      creditCost,
       expiresAt,
     },
     include: {
-      requester: { select: { id: true, username: true, karmaPoints: true } },
+      requester: { select: { id: true, username: true, credits: true } },
     },
   });
 
@@ -59,7 +88,7 @@ router.post('/', requireAuth, async (req: Request, res: Response) => {
           nearbyUsers.map((u) => u.id),
           nearbyUsers.map((u) => u.expoPushToken),
           `📍 New Rift nearby: ${title}`,
-          `Someone needs a ${type === 'INSTANT' ? 'quick' : 'global'} shot. Tap to fulfill!`
+          `${creditCost} credits up for grabs. Tap to fulfill!`
         );
       }
     } catch (err) {
@@ -104,10 +133,10 @@ router.get('/:id', requireAuth, async (req: Request, res: Response) => {
   const request = await prisma.request.findUnique({
     where: { id: req.params.id },
     include: {
-      requester: { select: { id: true, username: true, karmaPoints: true } },
+      requester: { select: { id: true, username: true, credits: true } },
       fulfillments: {
         include: {
-          fulfiller: { select: { id: true, username: true, karmaPoints: true } },
+          fulfiller: { select: { id: true, username: true, credits: true } },
           rating: true,
         },
       },
@@ -122,7 +151,7 @@ router.get('/:id', requireAuth, async (req: Request, res: Response) => {
   res.json(request);
 });
 
-// DELETE /requests/:id
+// DELETE /requests/:id — cancel and refund
 router.delete('/:id', requireAuth, async (req: Request, res: Response) => {
   const request = await prisma.request.findUnique({
     where: { id: req.params.id },
@@ -147,6 +176,10 @@ router.delete('/:id', requireAuth, async (req: Request, res: Response) => {
     where: { id: req.params.id },
     data: { status: 'CANCELLED' },
   });
+
+  if (request.creditCost > 0) {
+    await refundCredits(request.requesterId, request.creditCost);
+  }
 
   res.json({ success: true });
 });

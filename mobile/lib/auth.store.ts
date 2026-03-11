@@ -6,7 +6,7 @@ export interface AuthUser {
   id: string;
   email: string;
   username: string;
-  karmaPoints: number;
+  credits: number;
 }
 
 interface AuthState {

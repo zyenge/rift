@@ -20,8 +20,8 @@ interface Fulfillment {
   mediaUrl: string;
   mediaType: 'PHOTO' | 'VIDEO';
   status: 'PENDING' | 'ACCEPTED' | 'REJECTED';
-  karmaAwarded: number;
-  fulfiller: { id: string; username: string; karmaPoints: number };
+  creditsEarned: number;
+  fulfiller: { id: string; username: string; credits: number };
   rating: { score: number; comment?: string } | null;
 }
 
@@ -34,9 +34,10 @@ interface RequestDetail {
   lat: number;
   lng: number;
   radiusMeters: number;
+  creditCost: number;
   expiresAt: string;
   createdAt: string;
-  requester: { id: string; username: string; karmaPoints: number };
+  requester: { id: string; username: string; credits: number };
   fulfillments: Fulfillment[];
 }
 

@@ -6,9 +6,9 @@ interface Fulfillment {
   mediaUrl: string;
   mediaType: 'PHOTO' | 'VIDEO';
   status: 'PENDING' | 'ACCEPTED' | 'REJECTED';
-  fulfiller: { id: string; username: string; karmaPoints: number };
+  fulfiller: { id: string; username: string; credits: number };
   rating?: { score: number; comment?: string } | null;
-  karmaAwarded: number;
+  creditsEarned: number;
 }
 
 interface FulfillmentMediaProps {
@@ -98,7 +98,9 @@ export function FulfillmentMedia({
         </Text>
       )}
 
-      <Text style={styles.karma}>⚡ {fulfillment.karmaAwarded} karma awarded</Text>
+      {fulfillment.creditsEarned > 0 && (
+        <Text style={styles.credits}>💎 {fulfillment.creditsEarned} credits earned</Text>
+      )}
     </View>
   );
 }
@@ -163,5 +165,5 @@ const styles = StyleSheet.create({
   ratingLabel: { color: '#A8A8B8', marginRight: 4, fontSize: 13 },
   star: { fontSize: 24 },
   ratingDone: { paddingHorizontal: 12, paddingBottom: 8, color: '#A8A8B8' },
-  karma: { padding: 12, fontSize: 12, color: '#5A5A70' },
+  credits: { padding: 12, fontSize: 12, color: '#63B3ED', fontWeight: '600' },
 });

@@ -4,7 +4,7 @@ import { prisma } from '../config/prisma';
 import { requireAuth } from '../middleware/auth';
 import { upload } from '../middleware/upload';
 import { uploadToR2 } from '../services/storage.service';
-import { awardFulfillmentKarma, applyRatingKarma } from '../services/karma.service';
+import { awardCredits, fulfillerPayout } from '../services/credit.service';
 import { getIo } from '../sockets/fulfillment.socket';
 import { notifyUser } from '../services/notification.service';
 import { MediaType } from '@prisma/client';
@@ -58,12 +58,9 @@ router.post(
         status: 'PENDING',
       },
       include: {
-        fulfiller: { select: { id: true, username: true, karmaPoints: true } },
+        fulfiller: { select: { id: true, username: true, credits: true } },
       },
     });
-
-    // Award provisional karma
-    await awardFulfillmentKarma(fulfillerId, fulfillment.id, mediaType);
 
     // Emit real-time event to the request room
     try {
@@ -80,7 +77,7 @@ router.post(
         '📸 New fulfillment!',
         `Someone fulfilled your request "${request.title}"`,
         { requestId }
-      ).catch(() => {}); // non-fatal
+      ).catch(() => {});
     }
 
     res.status(201).json(fulfillment);
@@ -106,7 +103,7 @@ router.get('/:id/fulfillments', requireAuth, async (req: Request, res: Response)
   const fulfillments = await prisma.fulfillment.findMany({
     where: { requestId },
     include: {
-      fulfiller: { select: { id: true, username: true, karmaPoints: true } },
+      fulfiller: { select: { id: true, username: true, credits: true } },
       rating: true,
     },
     orderBy: { createdAt: 'desc' },
@@ -127,7 +124,7 @@ router.put('/:id/status', requireAuth, async (req: Request, res: Response) => {
     where: { id: req.params.id },
     include: {
       request: true,
-      fulfiller: { select: { expoPushToken: true } },
+      fulfiller: { select: { id: true, expoPushToken: true } },
     },
   });
 
@@ -141,16 +138,25 @@ router.put('/:id/status', requireAuth, async (req: Request, res: Response) => {
     return;
   }
 
+  let creditsEarned = 0;
+
+  if (status === 'ACCEPTED') {
+    creditsEarned = fulfillerPayout(fulfillment.request.creditCost);
+    await awardCredits(fulfillment.fulfillerId, creditsEarned);
+  }
+
   const updated = await prisma.fulfillment.update({
     where: { id: req.params.id },
-    data: { status: status as 'ACCEPTED' | 'REJECTED' },
+    data: {
+      status: status as 'ACCEPTED' | 'REJECTED',
+      ...(creditsEarned > 0 ? { creditsEarned } : {}),
+    },
     include: {
-      fulfiller: { select: { id: true, username: true, karmaPoints: true } },
+      fulfiller: { select: { id: true, username: true, credits: true } },
       rating: true,
     },
   });
 
-  // If accepted, mark the request as fulfilled
   if (status === 'ACCEPTED') {
     await prisma.request.update({
       where: { id: fulfillment.requestId },
@@ -166,7 +172,7 @@ router.put('/:id/status', requireAuth, async (req: Request, res: Response) => {
     // Not fatal
   }
 
-  // Notify the fulfiller of the decision
+  // Notify the fulfiller
   const fulfillerToken = fulfillment.fulfiller?.expoPushToken;
   if (fulfillerToken) {
     const accepted = status === 'ACCEPTED';
@@ -174,7 +180,7 @@ router.put('/:id/status', requireAuth, async (req: Request, res: Response) => {
       fulfillerToken,
       accepted ? '✅ Fulfillment accepted!' : '❌ Fulfillment rejected',
       accepted
-        ? `Your submission was accepted for "${fulfillment.request.title}"`
+        ? `You earned ${creditsEarned} credits for "${fulfillment.request.title}"`
         : `Your submission was rejected for "${fulfillment.request.title}"`,
       { requestId: fulfillment.requestId }
     ).catch(() => {});
@@ -224,9 +230,6 @@ router.post('/:id/rate', requireAuth, async (req: Request, res: Response) => {
       comment: parsed.data.comment,
     },
   });
-
-  // Apply karma adjustment
-  await applyRatingKarma(fulfillment.fulfillerId, fulfillment.id, parsed.data.score);
 
   res.status(201).json(rating);
 });

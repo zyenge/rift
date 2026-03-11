@@ -9,37 +9,27 @@ import {
   Alert,
 } from 'react-native';
 import { useAuthStore } from '../../lib/auth.store';
-import { KarmaBadge } from '../../components/ui/KarmaBadge';
+import { CreditBadge } from '../../components/ui/CreditBadge';
 import api from '../../lib/api';
 
 interface UserProfile {
   id: string;
   username: string;
   email: string;
-  karmaPoints: number;
+  credits: number;
   createdAt: string;
-}
-
-interface FulfillmentHistory {
-  id: string;
-  mediaType: 'PHOTO' | 'VIDEO';
-  status: string;
-  karmaAwarded: number;
-  createdAt: string;
-  request: { title: string };
 }
 
 export default function ProfileScreen() {
   const { user, logout, updateUser } = useAuthStore();
   const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [fulfillments, setFulfillments] = useState<FulfillmentHistory[]>([]);
   const [refreshing, setRefreshing] = useState(false);
 
   const load = useCallback(async () => {
     try {
       const { data } = await api.get<UserProfile>('/users/me');
       setProfile(data);
-      updateUser({ karmaPoints: data.karmaPoints });
+      updateUser({ credits: data.credits });
     } catch (err) {
       console.error(err);
     }
@@ -63,7 +53,6 @@ export default function ProfileScreen() {
   };
 
   const displayUser = profile ?? user;
-
   if (!displayUser) return null;
 
   const joinedYear = profile ? new Date(profile.createdAt).getFullYear() : '';
@@ -85,41 +74,66 @@ export default function ProfileScreen() {
         {joinedYear && <Text style={styles.joined}>Member since {joinedYear}</Text>}
       </View>
 
-      {/* Karma */}
-      <View style={styles.karmaCard}>
-        <Text style={styles.karmaTitle}>Karma Points</Text>
-        <KarmaBadge points={displayUser.karmaPoints} size="lg" />
-        <Text style={styles.karmaHint}>
-          Earn by fulfilling requests · Bonus for great ratings
+      {/* Credits */}
+      <View style={styles.creditCard}>
+        <Text style={styles.creditTitle}>Credits</Text>
+        <CreditBadge credits={displayUser.credits} size="lg" />
+        <Text style={styles.creditHint}>
+          Spend to request · Earn by fulfilling
         </Text>
       </View>
 
-      {/* Karma breakdown */}
+      {/* How it works */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>How to earn</Text>
-        <View style={styles.earningRow}>
-          <Text style={styles.earningIcon}>📸</Text>
-          <Text style={styles.earningLabel}>Photo upload</Text>
-          <Text style={styles.earningPoints}>+10 pts</Text>
+        <Text style={styles.sectionTitle}>How credits work</Text>
+        <View style={styles.row}>
+          <Text style={styles.rowIcon}>📍</Text>
+          <Text style={styles.rowLabel}>Post a request</Text>
+          <Text style={[styles.rowValue, { color: '#FF5A5A' }]}>− 2–10 credits</Text>
         </View>
-        <View style={styles.earningRow}>
-          <Text style={styles.earningIcon}>🎥</Text>
-          <Text style={styles.earningLabel}>Video upload</Text>
-          <Text style={styles.earningPoints}>+15 pts</Text>
+        <View style={styles.row}>
+          <Text style={styles.rowIcon}>📸</Text>
+          <Text style={styles.rowLabel}>Fulfill a request</Text>
+          <Text style={[styles.rowValue, { color: '#34C97B' }]}>+ credits</Text>
         </View>
-        <View style={styles.earningRow}>
-          <Text style={styles.earningIcon}>⭐⭐⭐⭐</Text>
-          <Text style={styles.earningLabel}>Rating ≥ 4 stars</Text>
-          <Text style={styles.earningPoints}>+5 bonus</Text>
-        </View>
-        <View style={styles.earningRow}>
-          <Text style={styles.earningIcon}>⭐⭐</Text>
-          <Text style={styles.earningLabel}>Rating ≤ 2 stars</Text>
-          <Text style={[styles.earningPoints, { color: '#FF5A5A' }]}>−2 pts</Text>
+        <View style={styles.row}>
+          <Text style={styles.rowIcon}>💎</Text>
+          <Text style={styles.rowLabel}>New user bonus</Text>
+          <Text style={[styles.rowValue, { color: '#63B3ED' }]}>30 free</Text>
         </View>
       </View>
 
-      {/* Sign out */}
+      {/* Pricing tiers */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Request pricing</Text>
+        <Text style={styles.sectionSubtitle}>Based on nearby users within 0.75 mi</Text>
+        <View style={styles.row}>
+          <Text style={styles.rowIcon}>🏜️</Text>
+          <Text style={styles.rowLabel}>No one nearby</Text>
+          <Text style={styles.rowValue}>10 credits</Text>
+        </View>
+        <View style={styles.row}>
+          <Text style={styles.rowIcon}>🌆</Text>
+          <Text style={styles.rowLabel}>1–5 users</Text>
+          <Text style={styles.rowValue}>8 credits</Text>
+        </View>
+        <View style={styles.row}>
+          <Text style={styles.rowIcon}>🏙️</Text>
+          <Text style={styles.rowLabel}>6–15 users</Text>
+          <Text style={styles.rowValue}>6 credits</Text>
+        </View>
+        <View style={styles.row}>
+          <Text style={styles.rowIcon}>🌇</Text>
+          <Text style={styles.rowLabel}>16–30 users</Text>
+          <Text style={styles.rowValue}>4 credits</Text>
+        </View>
+        <View style={styles.row}>
+          <Text style={styles.rowIcon}>🎪</Text>
+          <Text style={styles.rowLabel}>31+ users</Text>
+          <Text style={styles.rowValue}>2 credits</Text>
+        </View>
+      </View>
+
       <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
         <Text style={styles.logoutText}>Sign Out</Text>
       </TouchableOpacity>
@@ -153,22 +167,29 @@ const styles = StyleSheet.create({
   username: { color: '#F2F2F5', fontSize: 22, fontWeight: '800', marginBottom: 4 },
   email: { color: '#A8A8B8', fontSize: 14 },
   joined: { color: '#5A5A70', fontSize: 12, marginTop: 4 },
-  karmaCard: {
+  creditCard: {
     backgroundColor: '#18181C',
     margin: 16,
     borderRadius: 20,
     padding: 20,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(235, 122, 159, 0.20)',
+    borderColor: 'rgba(99, 179, 237, 0.20)',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.4,
     shadowRadius: 8,
     elevation: 3,
   },
-  karmaTitle: { fontSize: 11, color: '#5A5A70', marginBottom: 8, fontWeight: '700', letterSpacing: 1.2, textTransform: 'uppercase' },
-  karmaHint: { fontSize: 12, color: '#5A5A70', marginTop: 8, textAlign: 'center' },
+  creditTitle: {
+    fontSize: 11,
+    color: '#5A5A70',
+    marginBottom: 8,
+    fontWeight: '700',
+    letterSpacing: 1.2,
+    textTransform: 'uppercase',
+  },
+  creditHint: { fontSize: 12, color: '#5A5A70', marginTop: 8, textAlign: 'center' },
   section: {
     backgroundColor: '#18181C',
     marginHorizontal: 16,
@@ -178,17 +199,18 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#2C2C34',
   },
-  sectionTitle: { fontSize: 16, fontWeight: '700', color: '#F2F2F5', marginBottom: 12 },
-  earningRow: {
+  sectionTitle: { fontSize: 16, fontWeight: '700', color: '#F2F2F5', marginBottom: 4 },
+  sectionSubtitle: { fontSize: 12, color: '#5A5A70', marginBottom: 12 },
+  row: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#2C2C34',
   },
-  earningIcon: { fontSize: 20, width: 40 },
-  earningLabel: { flex: 1, fontSize: 14, color: '#A8A8B8' },
-  earningPoints: { fontSize: 14, fontWeight: '700', color: '#34C97B' },
+  rowIcon: { fontSize: 20, width: 40 },
+  rowLabel: { flex: 1, fontSize: 14, color: '#A8A8B8' },
+  rowValue: { fontSize: 14, fontWeight: '700', color: '#F2F2F5' },
   logoutBtn: {
     margin: 16,
     padding: 16,

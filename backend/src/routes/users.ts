@@ -19,7 +19,7 @@ router.get('/me', requireAuth, async (req: Request, res: Response) => {
       id: true,
       email: true,
       username: true,
-      karmaPoints: true,
+      credits: true,
       lastKnownLat: true,
       lastKnownLng: true,
       lastSeenAt: true,

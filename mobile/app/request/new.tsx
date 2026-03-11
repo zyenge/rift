@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -26,6 +26,16 @@ export default function NewRequestScreen() {
   const [type, setType] = useState<RequestType>('INSTANT');
   const [radius, setRadius] = useState('1000');
   const [loading, setLoading] = useState(false);
+  const [costPreview, setCostPreview] = useState<{ cost: number; balance: number } | null>(null);
+
+  // Fetch cost preview as soon as we have coordinates
+  useEffect(() => {
+    if (!lat || !lng) return;
+    api
+      .get<{ cost: number; balance: number }>('/requests/cost', { params: { lat, lng } })
+      .then(({ data }) => setCostPreview(data))
+      .catch(() => {}); // non-fatal
+  }, [lat, lng]);
 
   const handleSubmit = async () => {
     if (!title.trim()) {
@@ -34,6 +44,10 @@ export default function NewRequestScreen() {
     }
     if (!lat || !lng) {
       Alert.alert('Error', 'Location is required');
+      return;
+    }
+    if (costPreview && costPreview.balance < costPreview.cost) {
+      Alert.alert('Insufficient credits', `You need ${costPreview.cost} credits but only have ${costPreview.balance}.`);
       return;
     }
 
@@ -49,11 +63,14 @@ export default function NewRequestScreen() {
       });
       router.back();
     } catch (err: any) {
-      Alert.alert('Error', err?.response?.data?.error ?? 'Failed to create request');
+      const msg = err?.response?.data?.error ?? 'Failed to create request';
+      Alert.alert('Error', msg);
     } finally {
       setLoading(false);
     }
   };
+
+  const canAfford = !costPreview || costPreview.balance >= costPreview.cost;
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
@@ -96,24 +113,40 @@ export default function NewRequestScreen() {
         </>
       )}
 
-      <View style={styles.locationInfo}>
-        <Text style={styles.locationText}>
-          📍 Pin at {lat.toFixed(5)}, {lng.toFixed(5)}
-        </Text>
-        <Text style={styles.expiryText}>
-          ⏱ Expires in {type === 'INSTANT' ? '15 minutes' : '48 hours'}
-        </Text>
+      <View style={styles.infoCard}>
+        <View style={styles.infoRow}>
+          <Text style={styles.infoLabel}>📍 Pin</Text>
+          <Text style={styles.infoValue}>{lat.toFixed(5)}, {lng.toFixed(5)}</Text>
+        </View>
+        <View style={styles.infoRow}>
+          <Text style={styles.infoLabel}>⏱ Expires</Text>
+          <Text style={styles.infoValue}>{type === 'INSTANT' ? '15 minutes' : '48 hours'}</Text>
+        </View>
+        <View style={styles.infoRow}>
+          <Text style={styles.infoLabel}>💎 Cost</Text>
+          {costPreview ? (
+            <Text style={[styles.infoValue, !canAfford && styles.infoValueDanger]}>
+              {costPreview.cost} credits (balance: {costPreview.balance})
+            </Text>
+          ) : (
+            <Text style={styles.infoValueMuted}>calculating…</Text>
+          )}
+        </View>
       </View>
 
       <TouchableOpacity
-        style={[styles.submitBtn, loading && styles.submitDisabled]}
+        style={[styles.submitBtn, (loading || !canAfford) && styles.submitDisabled]}
         onPress={handleSubmit}
-        disabled={loading}
+        disabled={loading || !canAfford}
       >
         {loading ? (
           <ActivityIndicator color="#fff" />
         ) : (
-          <Text style={styles.submitText}>Drop Pin & Notify Nearby Users</Text>
+          <Text style={styles.submitText}>
+            {canAfford
+              ? `Drop Pin · ${costPreview ? costPreview.cost + ' credits' : '…'}`
+              : 'Not enough credits'}
+          </Text>
         )}
       </TouchableOpacity>
     </ScrollView>
@@ -145,17 +178,20 @@ const styles = StyleSheet.create({
     height: 90,
     textAlignVertical: 'top',
   },
-  locationInfo: {
+  infoCard: {
     backgroundColor: '#18181C',
     borderRadius: 14,
     borderWidth: 1,
     borderColor: '#2C2C34',
     padding: 14,
     marginTop: 20,
-    gap: 4,
+    gap: 8,
   },
-  locationText: { fontSize: 13, color: '#A8A8B8' },
-  expiryText: { fontSize: 13, color: '#EB7A9F', fontWeight: '600' },
+  infoRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  infoLabel: { fontSize: 13, color: '#A8A8B8' },
+  infoValue: { fontSize: 13, color: '#EB7A9F', fontWeight: '600' },
+  infoValueDanger: { color: '#FF5A5A' },
+  infoValueMuted: { fontSize: 13, color: '#5A5A70' },
   submitBtn: {
     backgroundColor: '#EB7A9F',
     borderRadius: 14,
@@ -168,6 +204,6 @@ const styles = StyleSheet.create({
     shadowRadius: 16,
     elevation: 8,
   },
-  submitDisabled: { opacity: 0.6 },
+  submitDisabled: { opacity: 0.5 },
   submitText: { color: '#fff', fontSize: 17, fontWeight: '700' },
 });

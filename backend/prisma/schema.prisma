@@ -14,7 +14,7 @@ model User {
   email           String    @unique
   username        String    @unique
   passwordHash    String
-  karmaPoints     Int       @default(0)
+  credits         Int       @default(30)
   expoPushToken   String?
   lastKnownLat    Float?
   lastKnownLng    Float?
@@ -39,6 +39,7 @@ model Request {
   lat          Float
   lng          Float
   radiusMeters Int           @default(1000)
+  creditCost   Int           @default(0)
   expiresAt    DateTime
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
@@ -50,19 +51,19 @@ model Request {
 }
 
 model Fulfillment {
-  id           String            @id @default(cuid())
-  requestId    String
-  fulfillerId  String
-  mediaUrl     String
-  mediaType    MediaType
-  status       FulfillmentStatus @default(PENDING)
-  karmaAwarded Int               @default(0)
-  createdAt    DateTime          @default(now())
-  updatedAt    DateTime          @updatedAt
+  id             String            @id @default(cuid())
+  requestId      String
+  fulfillerId    String
+  mediaUrl       String
+  mediaType      MediaType
+  status         FulfillmentStatus @default(PENDING)
+  creditsEarned  Int               @default(0)
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
 
-  request      Request           @relation(fields: [requestId], references: [id])
-  fulfiller    User              @relation("FulfillerFulfillments", fields: [fulfillerId], references: [id])
-  rating       Rating?
+  request        Request           @relation(fields: [requestId], references: [id])
+  fulfiller      User              @relation("FulfillerFulfillments", fields: [fulfillerId], references: [id])
+  rating         Rating?
 
   @@map("fulfillments")
 }
