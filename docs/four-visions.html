@@ -735,6 +735,96 @@
         }
       }
 
+      /* ── Use Cases panel ────────────────────────────────────────────── */
+      .panel-usecases {
+        background: var(--bg-elevated);
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .panel-usecases .panel-inner {
+        grid-template-columns: 1fr;
+        gap: 0;
+        max-width: min(1100px, 94vw);
+        padding: 5rem 0;
+      }
+
+      .uc-header {
+        text-align: center;
+        margin-bottom: 3rem;
+      }
+
+      .uc-header h2 {
+        margin-bottom: 0;
+      }
+
+      .uc-columns {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2.5rem 4rem;
+      }
+
+      .uc-group-label {
+        font-size: 0.68rem;
+        font-weight: 600;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--brand);
+        margin-bottom: 1.2rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid rgba(235, 122, 159, 0.2);
+      }
+
+      .uc-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 1.4rem;
+      }
+
+      .uc-card {
+        padding: 0.85rem 1.1rem;
+        background: var(--bg-surface);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+      }
+
+      .uc-card-title {
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.3rem;
+        letter-spacing: 0.01em;
+      }
+
+      .uc-card p {
+        font-size: 0.84rem;
+        line-height: 1.6;
+        color: var(--text-secondary);
+        max-width: 100%;
+        margin: 0;
+      }
+
+      .uc-footnote {
+        margin-top: 2.5rem;
+        font-size: 0.73rem !important;
+        color: var(--text-muted) !important;
+        line-height: 1.6 !important;
+        text-align: center;
+        max-width: 72ch;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      @media (max-width: 768px) {
+        .uc-columns {
+          grid-template-columns: 1fr;
+          gap: 2rem;
+        }
+
+        .panel-usecases .panel-inner {
+          padding: 3rem 0 2.5rem;
+        }
+      }
+
       /* ── Coming Soon panel ───────────────────────────────────────────── */
       .panel-cta {
         background: var(--bg-primary);
@@ -808,11 +898,12 @@
     <!-- ── Progress dots ──────────────────────────────────────────────── -->
     <nav id="progress-dots" aria-label="Section navigation">
       <button class="prog-dot active" data-idx="0" aria-label="Intro"></button>
-      <button class="prog-dot" data-idx="1" aria-label="Vision 1"></button>
-      <button class="prog-dot" data-idx="2" aria-label="Vision 2"></button>
-      <button class="prog-dot" data-idx="3" aria-label="Vision 3"></button>
-      <button class="prog-dot" data-idx="4" aria-label="Vision 4"></button>
-      <button class="prog-dot" data-idx="5" aria-label="Coming Soon"></button>
+      <button class="prog-dot" data-idx="1" aria-label="Use Cases"></button>
+      <button class="prog-dot" data-idx="2" aria-label="Vision 1"></button>
+      <button class="prog-dot" data-idx="3" aria-label="Vision 2"></button>
+      <button class="prog-dot" data-idx="4" aria-label="Vision 3"></button>
+      <button class="prog-dot" data-idx="5" aria-label="Vision 4"></button>
+      <button class="prog-dot" data-idx="6" aria-label="Coming Soon"></button>
     </nav>
 
     <main id="scroll-main">
@@ -852,15 +943,89 @@
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M8 3v10M4 9l4 4 4-4" stroke="#5A5A70" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
-            Scroll to explore four visions
+            Scroll to explore
           </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════════════════════════════ -->
+      <!-- USE CASES — Real Pain Points                                   -->
+      <!-- ══════════════════════════════════════════════════════════════ -->
+      <section class="panel panel-usecases" id="panel-1">
+        <div class="grid-lines"></div>
+
+        <div class="panel-inner">
+          <div class="uc-header">
+            <span class="eyebrow"><span class="dot"></span>Real Pain Points</span>
+            <h2>Questions no one answers.<br><span class="highlight">Until now, in near real time.</span></h2>
+          </div>
+
+          <div class="uc-columns">
+            <!-- LOCAL -->
+            <div class="uc-group">
+              <div class="uc-group-label">Local</div>
+              <div class="uc-grid">
+
+                <div class="uc-card">
+                  <div class="uc-card-title">Construction Detour Scope</div>
+                  <p>Google Maps doesn't show where the closure actually ends. A nearby commuter films the full blocked stretch and the cyclist takes the right detour.</p>
+                </div>
+
+                <div class="uc-card">
+                  <div class="uc-card-title">Farmers Market Vendor Check</div>
+                  <p>You want the honey vendor, not the whole market. Someone already there spots the stall and sends 15 seconds before you even leave home.</p>
+                </div>
+
+                <div class="uc-card">
+                  <div class="uc-card-title">Cherry Blossom Peak Check</div>
+                  <p>Instagram posts are 3 days old and perfectly staged. A jogger on the Reservoir path sends live bloom footage — you grab your jacket and go.</p>
+                </div>
+
+                <div class="uc-card">
+                  <div class="uc-card-title">Bryant Park Skating Crowd</div>
+                  <p>Is the rink worth the commute with skates already at the door? Someone on lunch break pans the ice — light crowd, open lanes, no queue.</p>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- TRAVEL -->
+            <div class="uc-group">
+              <div class="uc-group-label">Travel</div>
+              <div class="uc-grid">
+
+                <div class="uc-card">
+                  <div class="uc-card-title">Neighborhood Safety at Night</div>
+                  <p>Airbnb reviews are split and dated. She posts a pin at 11 PM — a local sends a 15-second walking video. Decision made in 90 seconds, no other product gives her that.</p>
+                </div>
+
+                <div class="uc-card">
+                  <div class="uc-card-title">Beach Conditions Before Booking</div>
+                  <p>TripAdvisor photos are 10 months old. Sargassum has covered that beach for 6 weeks. One video from the resort and they book the other hotel — $3,000 decision, resolved.</p>
+                </div>
+
+                <div class="uc-card">
+                  <div class="uc-card-title">Campsite Ground Truth</div>
+                  <p>Recreation.gov photos are from 2018. The day before arrival someone packing up sends a pan of site 47 — shade, spacing, bathrooms. They arrive knowing exactly what to expect.</p>
+                </div>
+
+                <div class="uc-card">
+                  <div class="uc-card-title">Trail Conditions at the Trailhead</div>
+                  <p>A section washed out Wednesday. Before leaving the car they post: "Any closures?" Someone who just turned back films the sign. AllTrails won't show you this. Rift does.</p>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+          <p class="uc-footnote">* Pain points sourced and validated from r/solotravel, r/travel, r/hiking, r/camping, TripAdvisor community forums, and Lonely Planet boards — the same questions asked thousands of times with no real-time answer.</p>
         </div>
       </section>
 
       <!-- ══════════════════════════════════════════════════════════════ -->
       <!-- VISION 1 — Real-Time Utility                                   -->
       <!-- ══════════════════════════════════════════════════════════════ -->
-      <section class="panel panel-v1 panel-vision" id="panel-1">
+      <section class="panel panel-v1 panel-vision" id="panel-2">
         <div class="grid-lines"></div>
 
         <div class="panel-inner">
@@ -897,7 +1062,7 @@
       <!-- ══════════════════════════════════════════════════════════════ -->
       <!-- VISION 2 — Emotional / Diaspora                                -->
       <!-- ══════════════════════════════════════════════════════════════ -->
-      <section class="panel panel-v2 panel-vision" id="panel-2">
+      <section class="panel panel-v2 panel-vision" id="panel-3">
         <div class="grid-lines"></div>
 
         <div class="panel-inner">
@@ -935,7 +1100,7 @@
       <!-- ══════════════════════════════════════════════════════════════ -->
       <!-- VISION 3 — Travel / Tourism                                    -->
       <!-- ══════════════════════════════════════════════════════════════ -->
-      <section class="panel panel-v3 panel-vision" id="panel-3">
+      <section class="panel panel-v3 panel-vision" id="panel-4">
         <div class="grid-lines"></div>
 
         <div class="panel-inner">
@@ -972,7 +1137,7 @@
       <!-- ══════════════════════════════════════════════════════════════ -->
       <!-- VISION 4 — Structured Reality Data                             -->
       <!-- ══════════════════════════════════════════════════════════════ -->
-      <section class="panel panel-v4 panel-vision" id="panel-4">
+      <section class="panel panel-v4 panel-vision" id="panel-5">
         <div class="grid-lines"></div>
 
         <div class="panel-inner">
@@ -1045,7 +1210,7 @@
       <!-- ══════════════════════════════════════════════════════════════ -->
       <!-- COMING SOON                                                     -->
       <!-- ══════════════════════════════════════════════════════════════ -->
-      <section class="panel panel-cta" id="panel-5">
+      <section class="panel panel-cta" id="panel-6">
         <div class="grid-lines"></div>
         <div class="blob blob-1"></div>
         <div class="blob blob-2"></div>
